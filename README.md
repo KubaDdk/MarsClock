@@ -1,5 +1,7 @@
 # Mars Clock
 
+<!-- redeploy trigger: forcing a fresh GitHub Pages build/publish cycle -->
+
 A retro/schematic solar system dashboard that shows the current Martian date and time, built with React, TypeScript, and Vite. Runs entirely client-side.
 
 - **Mars Sol Date (MSD)** and **Mars Coordinated Time (MTC)** computed live from the browser clock, using the epoch MSD 0.0 = 1873-12-29 00:00:00 UTC.
