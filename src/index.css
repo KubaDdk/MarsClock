@@ -119,6 +119,64 @@ body {
   opacity: 0.5;
 }
 
+.speed-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 8px 22px;
+  border-bottom: 1px solid var(--line-dim);
+  background: rgba(94, 234, 212, 0.02);
+  z-index: 10;
+}
+
+.speed-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.speed-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  background: transparent;
+  border: 1px solid var(--line-dim);
+  border-radius: 3px;
+  padding: 5px 9px;
+  cursor: pointer;
+}
+
+.speed-btn:hover {
+  border-color: var(--line);
+  color: var(--text);
+}
+
+.speed-btn.active {
+  background: rgba(94, 234, 212, 0.14);
+  border-color: var(--line);
+  color: var(--line);
+  text-shadow: 0 0 8px rgba(94, 234, 212, 0.4);
+}
+
+.speed-btn.now-btn {
+  border-color: var(--amber-strong);
+  color: var(--amber);
+}
+
+.speed-btn.now-btn:hover {
+  color: var(--amber-strong);
+}
+
+.sim-date {
+  font-size: 12px;
+  color: var(--line);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(94, 234, 212, 0.4);
+}
+
 .stage {
   position: relative;
   flex: 1;
@@ -167,7 +225,7 @@ body {
 
 .info-panel {
   position: absolute;
-  top: 76px;
+  top: 116px;
   right: 22px;
   bottom: 46px;
   width: min(340px, 88vw);
@@ -319,6 +377,44 @@ body {
   font-size: 11px;
 }
 
+.moons-list {
+  margin-top: 16px;
+  border-top: 1px solid rgba(94, 234, 212, 0.12);
+  padding-top: 12px;
+}
+
+.moons-list-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.moons-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.moons-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.mission-note {
+  margin-top: 14px;
+  font-size: 10.5px;
+  color: var(--text-dim);
+  opacity: 0.75;
+  font-style: italic;
+}
+
 @media (max-width: 640px) {
   .app-header {
     padding: 10px 14px;
@@ -328,6 +424,13 @@ body {
   }
   .hud-readout {
     font-size: 11px;
+  }
+  .speed-controls {
+    padding: 8px 14px;
+  }
+  .speed-btn {
+    font-size: 10px;
+    padding: 4px 7px;
   }
   .info-panel {
     right: 10px;

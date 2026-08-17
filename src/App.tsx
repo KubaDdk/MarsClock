@@ -1,27 +1,31 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import SolarSystem from './components/SolarSystem'
-import InfoPanel from './components/InfoPanel'
-import { computeMarsClock, formatMTC, pad2, type MarsClock } from './lib/marsTime'
+import InfoPanel, { type InfoSelection } from './components/InfoPanel'
+import SpeedControls from './components/SpeedControls'
+import { computeMarsClock, formatMTC, pad2 } from './lib/marsTime'
 import { PLANETS } from './lib/planets'
-
-function useMarsClock(): MarsClock {
-  const [clock, setClock] = useState(() => computeMarsClock(new Date()))
-  useEffect(() => {
-    const id = setInterval(() => setClock(computeMarsClock(new Date())), 1000)
-    return () => clearInterval(id)
-  }, [])
-  return clock
-}
+import { MISSIONS } from './lib/missions'
+import { useSimClock } from './lib/simClock'
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const marsClock = useMarsClock()
+  const { stateRef: simClockRef, speed, setSpeed, displayDate, resetToNow } = useSimClock()
+  const marsClock = computeMarsClock(displayDate)
 
   const handleSelect = useCallback((id: string | null) => {
     setSelectedId(id)
   }, [])
 
-  const selectedPlanet = PLANETS.find((p) => p.id === selectedId) ?? null
+  let selection: InfoSelection | null = null
+  if (selectedId) {
+    if (selectedId.startsWith('mission:')) {
+      const mission = MISSIONS.find((m) => `mission:${m.id}` === selectedId)
+      if (mission) selection = { type: 'mission', mission }
+    } else {
+      const planet = PLANETS.find((p) => p.id === selectedId)
+      if (planet) selection = { type: 'planet', planet }
+    }
+  }
 
   return (
     <div className="app">
@@ -41,19 +45,15 @@ export default function App() {
         </div>
       </header>
 
+      <SpeedControls speed={speed} onSetSpeed={setSpeed} onResetToNow={resetToNow} displayDate={displayDate} />
+
       <main className="stage">
-        <SolarSystem selectedId={selectedId} onSelect={handleSelect} />
-        {!selectedPlanet && (
-          <p className="hint">Click a planet to zoom in &mdash; try Mars.</p>
-        )}
+        <SolarSystem selectedId={selectedId} onSelect={handleSelect} simClockRef={simClockRef} />
+        {!selection && <p className="hint">Click a planet or a mission marker to zoom in &mdash; try Mars.</p>}
       </main>
 
-      {selectedPlanet && (
-        <InfoPanel
-          planet={selectedPlanet}
-          marsClock={selectedPlanet.id === 'mars' ? marsClock : null}
-          onClose={() => setSelectedId(null)}
-        />
+      {selection && (
+        <InfoPanel selection={selection} marsClock={marsClock} simDate={displayDate} onClose={() => setSelectedId(null)} />
       )}
 
       <footer className="app-footer">

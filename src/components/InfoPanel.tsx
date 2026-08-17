@@ -1,26 +1,26 @@
 import type { PlanetInfo } from '../lib/planets'
 import { formatMTC, pad2, type MarsClock } from '../lib/marsTime'
+import { MOONS } from '../lib/moons'
+import { PLANETS } from '../lib/planets'
+import { heliocentricMissionState, type MissionInfo } from '../lib/missions'
+
+export type InfoSelection =
+  | { type: 'planet'; planet: PlanetInfo }
+  | { type: 'mission'; mission: MissionInfo }
 
 interface InfoPanelProps {
-  planet: PlanetInfo
+  selection: InfoSelection
   marsClock: MarsClock | null
+  simDate: Date
   onClose: () => void
 }
 
-export default function InfoPanel({ planet, marsClock, onClose }: InfoPanelProps) {
+function PlanetPanel({ planet, marsClock }: { planet: PlanetInfo; marsClock: MarsClock | null }) {
   const isMars = planet.id === 'mars'
+  const moons = MOONS[planet.id] ?? []
 
   return (
-    <aside className="info-panel" role="dialog" aria-label={`${planet.name} information`}>
-      <button className="close-btn" onClick={onClose} aria-label="Back to overview">
-        &times;
-      </button>
-
-      <div className="info-header" style={{ borderColor: planet.color }}>
-        <span className="dot" style={{ background: planet.color }} />
-        <h2>{planet.name}</h2>
-      </div>
-
+    <>
       {isMars && marsClock && (
         <div className="mars-clock-block">
           <div className="mars-clock-label">MARTIAN LOCAL TIME</div>
@@ -41,6 +41,10 @@ export default function InfoPanel({ planet, marsClock, onClose }: InfoPanelProps
       <p className="fact">{planet.fact}</p>
 
       <dl className="stat-grid">
+        <div>
+          <dt>Distance from Sun</dt>
+          <dd>{planet.auFromSun} AU</dd>
+        </div>
         <div>
           <dt>Mass</dt>
           <dd>
@@ -68,6 +72,86 @@ export default function InfoPanel({ planet, marsClock, onClose }: InfoPanelProps
           <dd>{planet.moons}</dd>
         </div>
       </dl>
+
+      {moons.length > 0 && (
+        <div className="moons-list">
+          <div className="moons-list-label">Tracked moons</div>
+          <ul>
+            {moons.map((m) => (
+              <li key={m.name}>
+                <span>{m.name}</span>
+                <span className="muted">{m.periodDays < 1 ? `${(m.periodDays * 24).toFixed(1)} h` : `${m.periodDays.toFixed(1)} d`}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  )
+}
+
+function MissionPanel({ mission, simDate }: { mission: MissionInfo; simDate: Date }) {
+  const host = mission.hostPlanetId ? PLANETS.find((p) => p.id === mission.hostPlanetId) : null
+
+  return (
+    <>
+      <p className="fact">{mission.description}</p>
+      <dl className="stat-grid">
+        <div>
+          <dt>Agency</dt>
+          <dd>{mission.agency}</dd>
+        </div>
+        <div>
+          <dt>Launched</dt>
+          <dd>{mission.launched}</dd>
+        </div>
+        {mission.kind === 'orbiting' && host && (
+          <div>
+            <dt>Status</dt>
+            <dd>Orbiting {host.name}</dd>
+          </div>
+        )}
+        {mission.kind === 'heliocentric' &&
+          (() => {
+            const { au } = heliocentricMissionState(mission, simDate)
+            return (
+              <div>
+                <dt>Distance from Sun</dt>
+                <dd>
+                  ~{au.toFixed(au < 2 ? 2 : 1)} AU
+                  {mission.auPerYear ? (
+                    <span className="muted"> ({mission.auPerYear > 0 ? '+' : ''}{mission.auPerYear} AU/yr)</span>
+                  ) : null}
+                </dd>
+              </div>
+            )
+          })()}
+      </dl>
+      <p className="mission-note">Position is an approximation for this display, not live telemetry.</p>
+    </>
+  )
+}
+
+export default function InfoPanel({ selection, marsClock, simDate, onClose }: InfoPanelProps) {
+  const name = selection.type === 'planet' ? selection.planet.name : selection.mission.name
+  const color = selection.type === 'planet' ? selection.planet.color : selection.mission.color
+
+  return (
+    <aside className="info-panel" role="dialog" aria-label={`${name} information`}>
+      <button className="close-btn" onClick={onClose} aria-label="Back to overview">
+        &times;
+      </button>
+
+      <div className="info-header" style={{ borderColor: color }}>
+        <span className="dot" style={{ background: color }} />
+        <h2>{name}</h2>
+      </div>
+
+      {selection.type === 'planet' ? (
+        <PlanetPanel planet={selection.planet} marsClock={marsClock} />
+      ) : (
+        <MissionPanel mission={selection.mission} simDate={simDate} />
+      )}
     </aside>
   )
 }

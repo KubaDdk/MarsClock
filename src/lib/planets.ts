@@ -5,7 +5,8 @@ export interface PlanetInfo {
   glow: string
   radius: number // schematic display radius (px at scale 1)
   orbitRadius: number // schematic orbit radius (px at scale 1), not to real scale
-  orbitalPeriodDays: number // Earth days per orbit, used for relative animation speed
+  auFromSun: number // real average distance from the Sun, in astronomical units
+  orbitalPeriodDays: number // Earth days per orbit, used for animation
   rotationHours: number // length of one day/sol, in Earth hours
   rotationLabel: string // human label for the day length
   massKg: string
@@ -30,6 +31,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#e7e0d6',
     radius: 4,
     orbitRadius: 70,
+    auFromSun: 0.39,
     orbitalPeriodDays: 88,
     rotationHours: 1407.6,
     rotationLabel: '58 days 15 hours',
@@ -46,6 +48,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#ffe6b0',
     radius: 6,
     orbitRadius: 100,
+    auFromSun: 0.72,
     orbitalPeriodDays: 224.7,
     rotationHours: 5832.5,
     rotationLabel: '243 days (retrograde)',
@@ -62,6 +65,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#bfe3ff',
     radius: 6.4,
     orbitRadius: 136,
+    auFromSun: 1.0,
     orbitalPeriodDays: 365.25,
     rotationHours: 23.934,
     rotationLabel: '23 hours 56 minutes',
@@ -78,6 +82,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#ffb187',
     radius: 5,
     orbitRadius: 176,
+    auFromSun: 1.52,
     orbitalPeriodDays: 686.98,
     rotationHours: 24.6597,
     rotationLabel: '24 hours 39 minutes 35 seconds (1 sol)',
@@ -94,6 +99,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#ffd9a0',
     radius: 22,
     orbitRadius: 250,
+    auFromSun: 5.2,
     orbitalPeriodDays: 4332.6,
     rotationHours: 9.925,
     rotationLabel: '9 hours 56 minutes',
@@ -110,6 +116,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#fff0c9',
     radius: 19,
     orbitRadius: 320,
+    auFromSun: 9.58,
     orbitalPeriodDays: 10759,
     rotationHours: 10.66,
     rotationLabel: '10 hours 39 minutes',
@@ -126,6 +133,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#d4fbfb',
     radius: 13,
     orbitRadius: 380,
+    auFromSun: 19.2,
     orbitalPeriodDays: 30688.5,
     rotationHours: 17.24,
     rotationLabel: '17 hours 14 minutes (retrograde)',
@@ -142,6 +150,7 @@ export const PLANETS: PlanetInfo[] = [
     glow: '#a9c0ff',
     radius: 12.6,
     orbitRadius: 430,
+    auFromSun: 30.05,
     orbitalPeriodDays: 60195,
     rotationHours: 16.11,
     rotationLabel: '16 hours 6 minutes',
