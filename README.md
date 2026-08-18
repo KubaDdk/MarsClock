@@ -10,6 +10,7 @@ A retro/schematic solar system dashboard that shows the current Martian date and
 - **Speed controls** (real-time up to 1 year/second) fast-forward the whole simulation — planets, moons, missions, and the Mars calendar — to see where everything will be, with the simulated date always shown.
 - Click any planet — Mars especially — to fly the camera in and see live Martian time plus mass, gravity, day (sol) length, and year length. Zooming into a planet also reveals its major moons.
 - Ten real spacecraft are tracked schematically, from Voyager 1/2 and New Horizons out past the heliopause to Juno at Jupiter and the James Webb Space Telescope — click one to see its story and (approximate) current distance from the Sun.
+- **Birthdate Snapshot**: enter any date and the whole display freezes into the real planetary configuration for that day — ecliptic longitudes computed from low-precision Keplerian orbital elements (Paul Schlyter's classic method, epoch J2000.0), accurate to roughly a degree. Also shows the Moon's phase and each body's zodiac position. Use "Back to live" to resume real time.
 
 ## Development
 
