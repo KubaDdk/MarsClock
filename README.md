@@ -6,6 +6,7 @@ A retro/schematic solar system dashboard that shows the current Martian date and
 - Martian calendar dates rendered with the **Darian calendar** (24 months, 6 per quarter, 28/27 sols per month, decennial leap-mir rule).
 - A schematic, animated orrery: the Sun at the centre, all eight planets on visible orbital trajectories.
 - Click any planet — Mars especially — to fly the camera in and see live Martian time plus mass, gravity, day (sol) length, and year length.
+- **Birthdate Snapshot**: enter any date and the orrery freezes into the real planetary configuration for that day — real ecliptic longitudes computed from low-precision Keplerian orbital elements (Paul Schlyter's classic method, epoch J2000.0), accurate to roughly a degree. Also shows the Moon's phase and each body's zodiac position.
 
 ## Development
 

@@ -1,13 +1,22 @@
 import type { PlanetInfo } from '../lib/planets'
 import { formatMTC, pad2, type MarsClock } from '../lib/marsTime'
+import type { MoonSnapshot, PlanetSnapshot } from '../lib/ephemeris'
 
 interface InfoPanelProps {
   planet: PlanetInfo
   marsClock: MarsClock | null
+  snapshotPosition?: PlanetSnapshot | null
+  moonSnapshot?: MoonSnapshot | null
   onClose: () => void
 }
 
-export default function InfoPanel({ planet, marsClock, onClose }: InfoPanelProps) {
+export default function InfoPanel({
+  planet,
+  marsClock,
+  snapshotPosition,
+  moonSnapshot,
+  onClose,
+}: InfoPanelProps) {
   const isMars = planet.id === 'mars'
 
   return (
@@ -35,6 +44,20 @@ export default function InfoPanel({ planet, marsClock, onClose }: InfoPanelProps
             &nbsp;|&nbsp; Sol {marsClock.sol.toLocaleString()}
           </div>
           <div className="mars-clock-msd">MSD {marsClock.msd.toFixed(5)}</div>
+        </div>
+      )}
+
+      {snapshotPosition && (
+        <div className="mars-clock-block">
+          <div className="mars-clock-label">POSITION ON SNAPSHOT DATE</div>
+          <div className="mars-clock-date">
+            {Math.round(snapshotPosition.degreeInSign)}&deg; {snapshotPosition.sign}
+          </div>
+          {moonSnapshot && (
+            <div className="mars-clock-sub">
+              Moon: {moonSnapshot.phaseName} &middot; {Math.round(moonSnapshot.illumination * 100)}% lit
+            </div>
+          )}
         </div>
       )}
 
