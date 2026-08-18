@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { PLANETS, SUN, type PlanetInfo } from '../lib/planets'
+import type { SolarSystemSnapshot } from '../lib/ephemeris'
 
 interface SolarSystemProps {
   selectedId: string | null
   onSelect: (id: string | null) => void
+  /** When set, planets are frozen at their real ecliptic positions for this snapshot instead of animating. */
+  snapshot?: SolarSystemSnapshot | null
 }
 
 interface Camera {
@@ -33,11 +36,13 @@ function worldToScreen(
   return { x: cx + (wx - cam.x) * cam.scale, y: cy + (wy - cam.y) * cam.scale }
 }
 
-export default function SolarSystem({ selectedId, onSelect }: SolarSystemProps) {
+export default function SolarSystem({ selectedId, onSelect, snapshot }: SolarSystemProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const selectedIdRef = useRef(selectedId)
   selectedIdRef.current = selectedId
+  const snapshotRef = useRef(snapshot)
+  snapshotRef.current = snapshot
 
   const stateRef = useRef({
     cam: { x: 0, y: 0, scale: 0.6 } as Camera,
@@ -75,7 +80,10 @@ export default function SolarSystem({ selectedId, onSelect }: SolarSystemProps) 
     ro.observe(container)
 
     function planetWorldPos(p: PlanetInfo, idx: number, t: number) {
-      const angle = PHASE[idx] + t * SPEEDS[idx]
+      const snap = snapshotRef.current
+      const angle = snap
+        ? (snap.planets[p.id].longitudeDeg * Math.PI) / 180
+        : PHASE[idx] + t * SPEEDS[idx]
       return { x: Math.cos(angle) * p.orbitRadius, y: Math.sin(angle) * p.orbitRadius }
     }
 

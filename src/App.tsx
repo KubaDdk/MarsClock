@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import SolarSystem from './components/SolarSystem'
 import InfoPanel from './components/InfoPanel'
+import BirthdatePanel from './components/BirthdatePanel'
 import { computeMarsClock, formatMTC, pad2, type MarsClock } from './lib/marsTime'
 import { PLANETS } from './lib/planets'
+import { computeSnapshot } from './lib/ephemeris'
 
 function useMarsClock(): MarsClock {
   const [clock, setClock] = useState(() => computeMarsClock(new Date()))
@@ -15,7 +17,11 @@ function useMarsClock(): MarsClock {
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [birthdate, setBirthdate] = useState<Date | null>(null)
+  const [showBirthdatePanel, setShowBirthdatePanel] = useState(false)
   const marsClock = useMarsClock()
+
+  const snapshot = useMemo(() => (birthdate ? computeSnapshot(birthdate) : null), [birthdate])
 
   const handleSelect = useCallback((id: string | null) => {
     setSelectedId(id)
@@ -39,20 +45,38 @@ export default function App() {
             {pad2(marsClock.darian.solInMonth)}, Mir {marsClock.darian.mir}
           </span>
         </div>
+        <button
+          className="btn-secondary birthdate-toggle"
+          onClick={() => setShowBirthdatePanel((v) => !v)}
+        >
+          {snapshot ? 'Birth Sky' : 'Birthdate Snapshot'}
+        </button>
       </header>
 
       <main className="stage">
-        <SolarSystem selectedId={selectedId} onSelect={handleSelect} />
-        {!selectedPlanet && (
+        <SolarSystem selectedId={selectedId} onSelect={handleSelect} snapshot={snapshot} />
+        {!selectedPlanet && !snapshot && (
           <p className="hint">Click a planet to zoom in &mdash; try Mars.</p>
         )}
+        {snapshot && <p className="hint snapshot-hint">Showing sky for {snapshot.date.toISOString().slice(0, 10)}</p>}
       </main>
 
       {selectedPlanet && (
         <InfoPanel
           planet={selectedPlanet}
           marsClock={selectedPlanet.id === 'mars' ? marsClock : null}
+          snapshotPosition={snapshot ? snapshot.planets[selectedPlanet.id] : null}
+          moonSnapshot={selectedPlanet.id === 'earth' ? snapshot?.moon ?? null : null}
           onClose={() => setSelectedId(null)}
+        />
+      )}
+
+      {showBirthdatePanel && (
+        <BirthdatePanel
+          snapshot={snapshot}
+          onCompute={(date) => setBirthdate(date)}
+          onClear={() => setBirthdate(null)}
+          onClose={() => setShowBirthdatePanel(false)}
         />
       )}
 
