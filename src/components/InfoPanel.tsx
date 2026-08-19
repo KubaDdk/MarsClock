@@ -3,6 +3,7 @@ import { formatMTC, pad2, type MarsClock } from '../lib/marsTime'
 import { MOONS } from '../lib/moons'
 import { PLANETS } from '../lib/planets'
 import { heliocentricMissionState, type MissionInfo } from '../lib/missions'
+import { computeSnapshot } from '../lib/ephemeris'
 
 export type InfoSelection =
   | { type: 'planet'; planet: PlanetInfo }
@@ -12,12 +13,25 @@ interface InfoPanelProps {
   selection: InfoSelection
   marsClock: MarsClock | null
   simDate: Date
+  isSnapshot?: boolean
   onClose: () => void
 }
 
-function PlanetPanel({ planet, marsClock }: { planet: PlanetInfo; marsClock: MarsClock | null }) {
+function PlanetPanel({
+  planet,
+  marsClock,
+  simDate,
+  isSnapshot,
+}: {
+  planet: PlanetInfo
+  marsClock: MarsClock | null
+  simDate: Date
+  isSnapshot?: boolean
+}) {
   const isMars = planet.id === 'mars'
   const moons = MOONS[planet.id] ?? []
+  const snapshot = isSnapshot ? computeSnapshot(simDate) : null
+  const position = snapshot?.planets[planet.id]
 
   return (
     <>
@@ -35,6 +49,20 @@ function PlanetPanel({ planet, marsClock }: { planet: PlanetInfo; marsClock: Mar
             &nbsp;|&nbsp; Sol {marsClock.sol.toLocaleString()}
           </div>
           <div className="mars-clock-msd">MSD {marsClock.msd.toFixed(5)}</div>
+        </div>
+      )}
+
+      {position && (
+        <div className="mars-clock-block">
+          <div className="mars-clock-label">POSITION ON SNAPSHOT DATE</div>
+          <div className="mars-clock-date">
+            {Math.round(position.degreeInSign)}&deg; {position.sign}
+          </div>
+          {planet.id === 'earth' && snapshot && (
+            <div className="mars-clock-sub">
+              Moon: {snapshot.moon.phaseName} &middot; {Math.round(snapshot.moon.illumination * 100)}% lit
+            </div>
+          )}
         </div>
       )}
 
@@ -132,7 +160,7 @@ function MissionPanel({ mission, simDate }: { mission: MissionInfo; simDate: Dat
   )
 }
 
-export default function InfoPanel({ selection, marsClock, simDate, onClose }: InfoPanelProps) {
+export default function InfoPanel({ selection, marsClock, simDate, isSnapshot, onClose }: InfoPanelProps) {
   const name = selection.type === 'planet' ? selection.planet.name : selection.mission.name
   const color = selection.type === 'planet' ? selection.planet.color : selection.mission.color
 
@@ -148,7 +176,7 @@ export default function InfoPanel({ selection, marsClock, simDate, onClose }: In
       </div>
 
       {selection.type === 'planet' ? (
-        <PlanetPanel planet={selection.planet} marsClock={marsClock} />
+        <PlanetPanel planet={selection.planet} marsClock={marsClock} simDate={simDate} isSnapshot={isSnapshot} />
       ) : (
         <MissionPanel mission={selection.mission} simDate={simDate} />
       )}

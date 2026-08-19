@@ -45,5 +45,14 @@ export function useSimClock() {
     setDisplayDate(new Date(stateRef.current.simMs))
   }
 
-  return { stateRef, speed, setSpeed, displayDate, resetToNow }
+  /** Jumps to a specific date and freezes the clock there (speed 0) — used for
+   * point-in-time snapshots rather than continuous fast-forward playback. */
+  function jumpToDate(date: Date) {
+    stateRef.current.simMs = date.getTime()
+    stateRef.current.speed = 0
+    setSpeedState(0)
+    setDisplayDate(date)
+  }
+
+  return { stateRef, speed, setSpeed, displayDate, resetToNow, jumpToDate }
 }
